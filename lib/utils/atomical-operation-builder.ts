@@ -82,6 +82,8 @@ interface WorkerOut {
     finalSequence: number;
 }
 
+type BroadcastStep = "commit" | "reveal";
+
 export enum REALM_CLAIM_TYPE {
     DIRECT = "direct",
     RULE = "rule",
@@ -774,7 +776,7 @@ export class AtomicalOperationBuilder {
                         psbtStart,
                         interTx
                     );
-                    if (!this.broadcastWithRetries(rawtx)) {
+                    if (!this.broadcastWithRetries(rawtx, 'commit')) {
                         console.log("Error sending", interTx.getId(), rawtx);
                         throw new Error(
                             "Unable to broadcast commit transaction after attempts: " +
@@ -1033,7 +1035,7 @@ export class AtomicalOperationBuilder {
                 console.log("\nBroadcasting tx...", revealTx.getId());
                 const interTx = psbt.extractTransaction();
                 const rawtx = interTx.toHex();
-                if (!(await this.broadcastWithRetries(rawtx))) {
+                if (!(await this.broadcastWithRetries(rawtx, "reveal"))) {
                     console.log("Error sending", revealTx.getId(), rawtx);
                     throw new Error(
                         "Unable to broadcast reveal transaction after attempts"
@@ -1069,19 +1071,18 @@ export class AtomicalOperationBuilder {
         return ret;
     }
 
-    async broadcastWithRetries(rawtx: string): Promise<any> {
+    async broadcastWithRetries(rawtx: string, step: BroadcastStep): Promise<any> {
         let attempts = 0;
         let result = null;
         do {
             try {
-                console.log("rawtx", rawtx);
-
+                console.log(`Broadcasting ${step} tx: ${rawtx}`)
                 result = await this.options.electrumApi.broadcast(rawtx);
                 if (result) {
                     break;
                 }
             } catch (err) {
-                console.log("Network error broadcasting (Trying again soon...)");
+                console.log(`Broadcasting ${step} Network error broadcasting (Trying again soon...), tx:${rawtx}`);
                 await this.options.electrumApi.resetConnection();
                 // Put in a sleep to help the connection reset more gracefully in case there is some delay
                 console.log(
