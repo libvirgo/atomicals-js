@@ -1,32 +1,32 @@
 /**
-MIT License
+ MIT License
 
-Copyright (c) 2023 The Atomicals Developers - atomicals.xyz
+ Copyright (c) 2023 The Atomicals Developers - atomicals.xyz
 
-Parts of this file contains code created by the following users:
-https://github.com/danieleth2/atomicals-js/commit/02e854cc71c0f6c6559ff35c2093dc8d526b5d72
+ Parts of this file contains code created by the following users:
+ https://github.com/danieleth2/atomicals-js/commit/02e854cc71c0f6c6559ff35c2093dc8d526b5d72
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ */
 
-import { ElectrumApiInterface } from "../api/electrum-api.interface";
-import { KeyPairInfo, getKeypairInfo } from "./address-keypair-path";
+import {ElectrumApiInterface} from "../api/electrum-api.interface";
+import {KeyPairInfo, getKeypairInfo} from "./address-keypair-path";
 import * as os from "os";
 import {
     BitworkInfo,
@@ -39,14 +39,14 @@ import {
     isValidTickerName,
 } from "./atomical-format-helpers";
 import * as ecc from "tiny-secp256k1";
-import { ECPairFactory, ECPairAPI, TinySecp256k1Interface } from "ecpair";
+import {ECPairFactory, ECPairAPI, TinySecp256k1Interface} from "ecpair";
 
 const tinysecp: TinySecp256k1Interface = require("tiny-secp256k1");
 const bitcoin = require("bitcoinjs-lib");
 import * as chalk from "chalk";
 
 bitcoin.initEccLib(ecc);
-import { initEccLib, networks, Psbt, Transaction } from "bitcoinjs-lib";
+import {initEccLib, networks, Psbt, Transaction} from "bitcoinjs-lib";
 
 initEccLib(tinysecp as any);
 import {
@@ -58,12 +58,12 @@ import {
     prepareCommitRevealConfig,
     prepareFilesDataAsObject,
 } from "../commands/command-helpers";
-import { getFundingUtxo } from "./select-funding-utxo";
-import { sleeper } from "./utils";
-import { witnessStackToScriptWitness } from "../commands/witness_stack_to_script_witness";
-import { IInputUtxoPartial } from "../types/UTXO.interface";
-import { IWalletRecord } from "./validate-wallet-storage";
-import { parentPort, Worker } from "worker_threads";
+import {getFundingUtxo} from "./select-funding-utxo";
+import {sleeper} from "./utils";
+import {witnessStackToScriptWitness} from "../commands/witness_stack_to_script_witness";
+import {IInputUtxoPartial} from "../types/UTXO.interface";
+import {IWalletRecord} from "./validate-wallet-storage";
+import {parentPort, Worker} from "worker_threads";
 
 const ECPair: ECPairAPI = ECPairFactory(tinysecp);
 export const DEFAULT_SATS_BYTE = 10;
@@ -677,7 +677,7 @@ export class AtomicalOperationBuilder {
         this.options.electrumApi.close();
 
         // Set the default concurrency level to the number of CPU cores minus 1
-        const defaultConcurrency = (os.cpus().length - 2)*2;
+        const defaultConcurrency = (os.cpus().length + 2);
         // Read the concurrency level from .env file
         const envConcurrency = process.env.CONCURRENCY
             ? parseInt(process.env.CONCURRENCY, 10)
@@ -739,7 +739,7 @@ export class AtomicalOperationBuilder {
                         atomPayload
                     );
 
-                    let psbtStart = new Psbt({ network: NETWORK });
+                    let psbtStart = new Psbt({network: NETWORK});
                     psbtStart.setVersion(1);
 
                     psbtStart.addInput({
@@ -780,7 +780,7 @@ export class AtomicalOperationBuilder {
                         console.log("Error sending", interTx.getId(), rawtx);
                         throw new Error(
                             "Unable to broadcast commit transaction after attempts: " +
-                                interTx.getId()
+                            interTx.getId()
                         );
                     } else {
                         console.log("Success sent tx: ", interTx.getId());
@@ -876,7 +876,7 @@ export class AtomicalOperationBuilder {
             let totalOutputsForReveal = 0; // Calculate total outputs for the reveal and compare to totalInputsforReveal and reveal fee
             let nonce = Math.floor(Math.random() * 100000000);
             let unixTime = Math.floor(Date.now() / 1000);
-            let psbt = new Psbt({ network: NETWORK });
+            let psbt = new Psbt({network: NETWORK});
             psbt.setVersion(1);
             psbt.addInput({
                 sequence: this.options.rbf ? RBF_INPUT_SEQUENCE : undefined,
@@ -898,7 +898,7 @@ export class AtomicalOperationBuilder {
                     index: additionalInput.utxo.index,
                     witnessUtxo: additionalInput.utxo.witnessUtxo,
                     tapInternalKey:
-                        additionalInput.keypairInfo.childNodeXOnlyPubkey,
+                    additionalInput.keypairInfo.childNodeXOnlyPubkey,
                 });
                 totalInputsforReveal += additionalInput.utxo.witnessUtxo.value;
             }
@@ -921,9 +921,9 @@ export class AtomicalOperationBuilder {
                     hash: parentAtomicalInfo.parentUtxoPartial.hash,
                     index: parentAtomicalInfo.parentUtxoPartial.index,
                     witnessUtxo:
-                        parentAtomicalInfo.parentUtxoPartial.witnessUtxo,
+                    parentAtomicalInfo.parentUtxoPartial.witnessUtxo,
                     tapInternalKey:
-                        parentAtomicalInfo.parentKeyInfo.childNodeXOnlyPubkey,
+                    parentAtomicalInfo.parentKeyInfo.childNodeXOnlyPubkey,
                 });
                 totalInputsforReveal +=
                     parentAtomicalInfo.parentUtxoPartial.witnessUtxo.value;
@@ -940,7 +940,7 @@ export class AtomicalOperationBuilder {
                 unixTime = Math.floor(Date.now() / 1000);
             }
             const data = Buffer.from(unixTime + ":" + nonce, "utf8");
-            const embed = bitcoin.payments.embed({ data: [data] });
+            const embed = bitcoin.payments.embed({data: [data]});
 
             if (performBitworkForRevealTx) {
                 psbt.addOutput({
@@ -1143,21 +1143,21 @@ export class AtomicalOperationBuilder {
 
         return Math.ceil(
             (this.options.satsbyte as any) *
-                (BASE_BYTES +
-                    // Reveal input
-                    REVEAL_INPUT_BYTES_BASE +
-                    (hashLockCompactSizeBytes + hashLockP2TROutputLen) / 4 +
-                    // Additional inputs
-                    this.inputUtxos.length * INPUT_BYTES_BASE +
-                    // Outputs
-                    this.additionalOutputs.length * OUTPUT_BYTES_BASE)
+            (BASE_BYTES +
+                // Reveal input
+                REVEAL_INPUT_BYTES_BASE +
+                (hashLockCompactSizeBytes + hashLockP2TROutputLen) / 4 +
+                // Additional inputs
+                this.inputUtxos.length * INPUT_BYTES_BASE +
+                // Outputs
+                this.additionalOutputs.length * OUTPUT_BYTES_BASE)
         );
     }
 
     calculateFeesRequiredForCommit(): number {
-        let fees =  Math.ceil(
+        let fees = Math.ceil(
             (this.options.satsbyte as any) *
-                (BASE_BYTES + 1 * INPUT_BYTES_BASE + 1 * OUTPUT_BYTES_BASE)
+            (BASE_BYTES + 1 * INPUT_BYTES_BASE + 1 * OUTPUT_BYTES_BASE)
         );
         return fees;
     }
@@ -1298,7 +1298,7 @@ export class AtomicalOperationBuilder {
         parentId,
         parentOwner: IWalletRecord
     ): Promise<ParentInputAtomical> {
-        const { atomicalInfo, locationInfo, inputUtxoPartial } =
+        const {atomicalInfo, locationInfo, inputUtxoPartial} =
             await getAndCheckAtomicalInfo(
                 electrumxApi,
                 parentId,
