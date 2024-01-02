@@ -115,7 +115,7 @@ export class ElectrumApi implements ElectrumApiInterface {
                 console.log('...');
                 try {
                     const response: any = await this.getUnspentAddress(address).catch((e) => {
-                        console.error(e);
+                        // console.error(e);
                         return {unconfirmed: 0, confirmed: 0, utxos: []};
                     });
                     const utxos = response.utxos.sort((a, b) => a.value - b.value);
@@ -141,7 +141,7 @@ export class ElectrumApi implements ElectrumApiInterface {
                     }
 
                 } catch (error) {
-                    console.error(error);
+                    // console.error(error);
                     reject(error);
                     clearInterval(intervalId);
                 }
