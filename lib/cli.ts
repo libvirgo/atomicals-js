@@ -23,7 +23,7 @@ dotenv.config();
 // General Helper Functions
 /////////////////////////////////////////////////////////////////////////////////////////////
 function printSuccess(data: any, showDonation?: boolean) {
-    console.log(JSON.stringify(data, null, 2));
+    console.log(JSON.stringify(data));
     if (!showDonation) {
         return;
     }
