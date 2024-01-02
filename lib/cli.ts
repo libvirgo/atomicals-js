@@ -54,7 +54,8 @@ function printSuccess(data: any, showDonation?: boolean) {
 }
 
 function printFailure(data: any) {
-    console.log(JSON.stringify(data, null, 2));
+    console.log(`error occurs:${data.message} statusCode:${data.error.message.status}`)
+
 }
 
 function handleResultLogging(result: any, showDonation?: boolean) {

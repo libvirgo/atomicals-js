@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable prettier/prettier */
-import axios, { AxiosResponse } from 'axios';
-import { ElectrumApiInterface, IUnspentResponse } from "./electrum-api.interface";
-import { UTXO } from "../types/UTXO.interface"
-import { detectAddressTypeToScripthash } from "../utils/address-helpers"
+import axios, {AxiosResponse} from 'axios';
+import {ElectrumApiInterface, IUnspentResponse} from "./electrum-api.interface";
+import {UTXO} from "../types/UTXO.interface"
+import {detectAddressTypeToScripthash} from "../utils/address-helpers"
 
 export class ElectrumApi implements ElectrumApiInterface {
     private isOpenFlag = false;
@@ -50,7 +50,7 @@ export class ElectrumApi implements ElectrumApiInterface {
             }
             return response.data.response;
         } catch (error) {
-            console.log(error);
+            console.log(`Error calling ${method} with params ${JSON.stringify(params)} error: ${error}`)
             throw error;
         }
     }
@@ -108,6 +108,7 @@ export class ElectrumApi implements ElectrumApiInterface {
             }
             return utxo && utxo.height <= 0;
         }
+
         return new Promise((resolve, reject) => {
             let intervalId: any;
             const checkForUtxo = async () => {
@@ -215,7 +216,7 @@ export class ElectrumApi implements ElectrumApiInterface {
     }
 
     public atomicalsByAddress(address: string): Promise<any> {
-        const { scripthash } = detectAddressTypeToScripthash(address);
+        const {scripthash} = detectAddressTypeToScripthash(address);
         return this.atomicalsByScripthash(scripthash)
     }
 
