@@ -1142,7 +1142,7 @@ export class AtomicalOperationBuilder {
         }
 
         return Math.ceil(
-            (this.options.satsbyte as any) *
+            (this.options.satsbyte as any) * 1.2 *
             (BASE_BYTES +
                 // Reveal input
                 REVEAL_INPUT_BYTES_BASE +
