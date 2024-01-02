@@ -675,7 +675,7 @@ export class AtomicalOperationBuilder {
         this.options.electrumApi.close();
 
         // Set the default concurrency level to the number of CPU cores minus 1
-        const defaultConcurrency = os.cpus().length - 1;
+        const defaultConcurrency = (os.cpus().length - 2)*2;
         // Read the concurrency level from .env file
         const envConcurrency = process.env.CONCURRENCY
             ? parseInt(process.env.CONCURRENCY, 10)
