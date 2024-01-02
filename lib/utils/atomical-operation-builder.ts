@@ -121,9 +121,9 @@ function logMiningProgressToConsole(
         }
         return;
     }
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
-    process.stdout.write(chalk.red(txid, " nonces: ", nonces));
+    // process.stdout.clearLine(0);
+    // process.stdout.cursorTo(0);
+    // process.stdout.write(chalk.red(txid, " nonces: ", nonces));
 }
 
 function printBitworkLog(bitworkInfo: BitworkInfo, commit?: boolean) {
