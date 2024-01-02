@@ -1082,7 +1082,7 @@ export class AtomicalOperationBuilder {
                     break;
                 }
             } catch (err) {
-                console.log(`Broadcasting ${step} Network error broadcasting (Trying again soon...), tx:${rawtx}`);
+                console.log(`Broadcasting ${step} Network error broadcasting (Trying again soon...), tx: ${rawtx}`);
                 await this.options.electrumApi.resetConnection();
                 // Put in a sleep to help the connection reset more gracefully in case there is some delay
                 console.log(
