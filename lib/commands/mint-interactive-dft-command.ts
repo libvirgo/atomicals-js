@@ -40,7 +40,6 @@ export class MintInteractiveDftCommand implements CommandInterface {
       }, undefined, undefined)
 
     logBanner('Mint Interactive FT (Decentralized)');
-    console.log("Atomical type:", 'FUNGIBLE (decentralized)', filesData, this.ticker);
     console.log("Mint for ticker: ", this.ticker);
 
     const atomicalIdResult = await this.electrumApi.atomicalsGetByTicker(this.ticker);
@@ -49,7 +48,7 @@ export class MintInteractiveDftCommand implements CommandInterface {
     const atomicalInfo = atomicalResponse.result;
     const atomicalDecorated = decorateAtomical(atomicalInfo);
 
-    console.log(globalInfo, atomicalDecorated);
+    // console.log(globalInfo, atomicalDecorated);
 
     if (!atomicalDecorated['$ticker'] || atomicalDecorated['$ticker'] != this.ticker) {
       throw new Error('Ticker being requested does not match the initialized decentralized FT mint: ' + atomicalDecorated)
@@ -81,7 +80,7 @@ export class MintInteractiveDftCommand implements CommandInterface {
       console.log(`There are already ${mint_count} mints of ${ticker} out of a max total of ${max_mints}.`)
     }
  
-    console.log('atomicalDecorated', atomicalResponse, atomicalDecorated);
+    // console.log('atomicalDecorated', atomicalResponse, atomicalDecorated);
     const atomicalBuilder = new AtomicalOperationBuilder({
       electrumApi: this.electrumApi,
       rbf: this.options.rbf,

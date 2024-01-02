@@ -633,17 +633,17 @@ export class AtomicalOperationBuilder {
             copiedData["args"]["time"] = unixtime;
         }
 
-        console.log("copiedData", copiedData);
+        // console.log("copiedData", copiedData);
         const mockAtomPayload = new AtomicalsPayload(copiedData);
         if (this.options.verbose) {
             console.log("copiedData", copiedData);
         }
         const payloadSize = mockAtomPayload.cbor().length;
-        console.log("Payload CBOR Size (bytes): ", payloadSize);
+        // console.log("Payload CBOR Size (bytes): ", payloadSize);
 
-        if (payloadSize <= 1000) {
-            console.log("Payload Encoded: ", copiedData);
-        }
+        // if (payloadSize <= 1000) {
+        //     console.log("Payload Encoded: ", copiedData);
+        // }
 
         const mockBaseCommitForFeeCalculation: { scriptP2TR; hashLockP2TR } =
             prepareCommitRevealConfig(

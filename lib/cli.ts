@@ -54,8 +54,11 @@ function printSuccess(data: any, showDonation?: boolean) {
 }
 
 function printFailure(data: any) {
-    console.log(`error occurs:${data.message} statusCode:${data.error.message.status}`)
-
+    if (data.error.response) {
+        console.log(`error occurs:${data.message} statusCode:${data.error.response.status} statusText:${data.error.response.statusText}`)
+    } else {
+        console.log(`error occurs:${data.message}`)
+    }
 }
 
 function handleResultLogging(result: any, showDonation?: boolean) {
