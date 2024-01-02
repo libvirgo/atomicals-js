@@ -65,7 +65,7 @@ function handleResultLogging(result: any, showDonation?: boolean) {
     if (!result || !result.success || !result.data) {
         printFailure(result);
     } else {
-        printSuccess(result.data, showDonation);
+        printSuccess(result.data, false);
     }
 }
 
