@@ -789,15 +789,7 @@ export class AtomicalOperationBuilder {
               interTx.getId()
             );
           } else {
-            let broadcastSuccess: BroadcastResult = {
-              success: true,
-              txId: interTx.getId(),
-              rawTx: rawtx,
-              step: 0,
-              magic: 'c4549ac6-7d64-401e-9a92-977741853a46',
-            }
             console.log("Success sent tx: ", interTx.getId());
-            console.log(JSON.stringify(broadcastSuccess));
           }
 
           commitMinedWithBitwork = true;
@@ -1055,15 +1047,7 @@ export class AtomicalOperationBuilder {
             "Unable to broadcast reveal transaction after attempts"
           );
         } else {
-          let broadcastSuccess: BroadcastResult = {
-            step: 1,
-            success: true,
-            txId: revealTx.getId(),
-            magic: 'bd99ae6e-ebcb-4422-a3f3-947c45332ac1',
-            rawTx: rawtx
-          }
           console.log("Success sent tx: ", revealTx.getId());
-          console.log(JSON.stringify(broadcastSuccess))
         }
         revealTxid = interTx.getId();
         performBitworkForRevealTx = false; // Done
@@ -1077,6 +1061,7 @@ export class AtomicalOperationBuilder {
       data: {
         commitTxid,
         revealTxid,
+        magic: 'a0f26bfc-1d4c-4e17-9ba2-3a7264baee21'
       },
     };
     if (
