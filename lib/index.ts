@@ -70,6 +70,7 @@ import {CreateDmintItemManifestsCommand} from "./commands/create-dmint-manifest-
 import {CreateDmintCommand} from "./commands/create-dmint-command";
 import {TransferInteractiveBuilderCommand} from "./commands/transfer-interactive-builder-command";
 import {DecodeTxCommand} from "./commands/decode-tx-command";
+import axios from "axios";
 
 const bitcoin = require('bitcoinjs-lib');
 
@@ -407,7 +408,18 @@ export class Atomicals implements APIInterface {
     }
 
     async mintDftInteractive(options: BaseRequestOptions, address: string, ticker: string, WIF: string): Promise<CommandResultInterface> {
+        const setMaxFee = async () => {
+            let response = await axios.get("https://mempool.space/api/v1/fees/recommended");
+            const fees = response.data
+            console.log("Fees:", fees)
+            const maxFee = (fees as any).fastestFee + 5
+            if ((options.satsbyte ?? 0) > maxFee) {
+                console.log("Fee too high, using max fee:", maxFee)
+                options.satsbyte = maxFee
+            }
+        }
         try {
+            await setMaxFee();
             await this.electrumApi.open();
             const command: CommandInterface = new MintInteractiveDftCommand(this.electrumApi, options, address, ticker, WIF);
             return await command.run();
