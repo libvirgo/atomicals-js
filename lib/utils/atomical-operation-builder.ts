@@ -717,7 +717,7 @@ export class AtomicalOperationBuilder {
 
     // Calculate the range of sequences to be assigned to each worker
     const seqRangePerWorker = Math.floor(MAX_SEQUENCE / concurrency);
-
+    let startTime = new Date().getTime();
     // Initialize and start worker threads
     for (let i = 0; i < concurrency; i++) {
       console.log("Initializing worker: " + i);
@@ -840,6 +840,7 @@ export class AtomicalOperationBuilder {
         workerBitworkInfoCommit,
         scriptP2TR,
         hashLockP2TR,
+        concurrency,
       };
       worker.postMessage(messageToWorker);
       workers.push(worker);
@@ -850,6 +851,8 @@ export class AtomicalOperationBuilder {
     // Await results from workers
     const messageFromWorker = await workerPromise;
     console.log("Workers have completed their tasks.");
+    let endTime = new Date().getTime();
+    console.log("Commit workers Total time taken: " + (endTime - startTime) / 1000 + " seconds");
 
     ////////////////////////////////////////////////////////////////////////
     // Begin Reveal Transaction

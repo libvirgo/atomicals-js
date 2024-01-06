@@ -53,6 +53,7 @@ interface WorkerInput {
 // This is the worker's message event listener
 if (parentPort) {
     parentPort.on("message", async (message: WorkerInput) => {
+        console.log("worker got message:", JSON.stringify(message));
         // Extract parameters from the message
         const {
             copiedData,
