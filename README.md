@@ -5,16 +5,29 @@
 
 ![Atomicals](banner.png)
 
-
 ### WARNING: STRONGLY RECOMMENDED TO USE YARN INSTEAD OF NPM
 
 Use `yarn` package manager instead of `npm`. Instructions below (They are: `npm install -g yarn`)
 
-In the latest version of the CLI processing library the option switches (the settings starting with `--`) are not processed correctly and it would lead to
+In the latest version of the CLI processing library the option switches (the settings starting with `--`) are not
+processed correctly and it would lead to
 too small of a fee being set and result in your transactions not being mined.
 
 Workaround: Use `yarn` instead of `npm`
 
+## Different between Official and this fork
+
+this fork use rust to calculate psbt, so it's faster than official one to mint-dft.
+
+because of the reason, you should install rust additional.
+
+and for better use `mint-dft` in command line, change `toaddr` and `funding` to pass by command line arguments,
+
+for example : 
+
+`yarn run cli mint-dft sophon --url https://ep.nextdao.xyz/proxy --toaddr <address> --funding <WIF> --satsbyte 100`
+
+reference `yarn cli mint-dft --help` for more information.
 
 ### Install, Build and Run Tests
 
@@ -22,7 +35,7 @@ Workaround: Use `yarn` instead of `npm`
 
 ```
 # Download the github repo:
-git clone https://github.com/atomicals/atomicals-js.git
+git clone --recursive https://github.com/libvirgo/atomicals-js.git
 
 cd atomicals-js
 
@@ -42,11 +55,13 @@ yarn run cli --help
 
 ### Quick Start - Command Line (CLI)
 
-First install packages and build, then follow the steps here to create your first Atomical and query the status. Use `yarn cli`to get a list of all commands available.
+First install packages and build, then follow the steps here to create your first Atomical and query the status.
+Use `yarn cli`to get a list of all commands available.
 
 #### 0. Environment File (.env)
 
-The environment file comes with defaults (`.env.example`), but it is highly recommend to install and operate your own ElectrumX server. Web browser communication is possible through the `wss` (secure websockets) interface of ElectrumX.
+The environment file comes with defaults (`.env.example`), but it is highly recommend to install and operate your own
+ElectrumX server. Web browser communication is possible through the `wss` (secure websockets) interface of ElectrumX.
 
 ```
 ELECTRUMX_WSS=wss://electrumx.atomicals.xyz:50012
@@ -58,13 +73,17 @@ WALLET_PATH=path-to-wallet.json
 CONCURRENCY=4
 ```
 
-_ELECTRUMX_WSS_: URL of the ElectrumX with Atomicals support. Note that only `wss` endpoints are accessible from web browsers.
+_ELECTRUMX_WSS_: URL of the ElectrumX with Atomicals support. Note that only `wss` endpoints are accessible from web
+browsers.
 
 #### 1. Wallet Setup
 
-The purpose of the wallet is to create p2tr (pay-to-taproot) spend scripts and to receive change from the transactions made for the various operations. _Do not put more funds than you can afford to lose, as this is still beta!_
+The purpose of the wallet is to create p2tr (pay-to-taproot) spend scripts and to receive change from the transactions
+made for the various operations. _Do not put more funds than you can afford to lose, as this is still beta!_
 
-To initialize a new `wallet.json` file that will store your address for receiving change use the `wallet-init` command. Alternatively, you may populate the `wallet.json` manually, ensuring that the address at `m/44'/0'/0'/0/0` is equal to the address and the derivePath is set correctly.
+To initialize a new `wallet.json` file that will store your address for receiving change use the `wallet-init` command.
+Alternatively, you may populate the `wallet.json` manually, ensuring that the address at `m/44'/0'/0'/0/0` is equal to
+the address and the derivePath is set correctly.
 
 Configure the path in the environment `.env` file to point to your wallet file. defaults to `./wallet.json`
 
@@ -125,7 +144,9 @@ https://x.com/atomicalsxyz (X - Formerly Twitter)
 
 ## Donate to Atomicals Development
 
-We greatly appreciate any donation to help support Atomicals Protocol development. We worked out of passion and kindness for the world, we believe this technology must exist and be free for all to use. Bitcoin is our one hope for freedom and digital sovereignty and we intend to do our best to make it a reality.
+We greatly appreciate any donation to help support Atomicals Protocol development. We worked out of passion and kindness
+for the world, we believe this technology must exist and be free for all to use. Bitcoin is our one hope for freedom and
+digital sovereignty and we intend to do our best to make it a reality.
 
 BTC: bc1pa5hvv3w3wjwfktd63zcng6yeccxg9aa90e34n9jrjw3thgc52reqxw6has
 

@@ -7,7 +7,7 @@
   "typings": "dist/index.d.ts",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc && gulp build",
+    "build": "tsc && gulp build && cargo build --manifest-path ./psbt_rs/Cargo.toml --release && rm ./psbt && mv ./psbt_rs/target/release/psbt ./psbt",
     "cli": "node dist/cli.js",
     "test": "mocha --timeout=30000 --reporter spec \"test/**/*.test.js\"",
     "e2e": "mocha --grep e2e  --timeout=300000 --reporter spec",
