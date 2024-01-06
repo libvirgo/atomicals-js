@@ -17,17 +17,18 @@ Workaround: Use `yarn` instead of `npm`
 
 ## Different between Official and this fork
 
-this fork use rust to calculate psbt, so it's faster than official one to mint-dft.
+this fork use `Rust` to calculate psbt, so it's **faster** than official one to mint-dft.
 
-because of the reason, you should install rust additional.
+because of the reason, you should install `Rust` additional.
 
 and for better use `mint-dft` in command line, change `toaddr` and `funding` to pass by command line arguments,
 
-for example : 
+for example :
 
-`yarn run cli mint-dft sophon --url https://ep.nextdao.xyz/proxy --toaddr <address> --funding <WIF> --satsbyte 100`
-
-reference `yarn cli mint-dft --help` for more information.
+```shell
+yarn run cli mint-dft sophon --url https://ep.nextdao.xyz/proxy --toaddr <address> --funding <WIF> --satsbyte 100
+yarn cli mint-dft --help # for more information
+```
 
 ### Install, Build and Run Tests
 
