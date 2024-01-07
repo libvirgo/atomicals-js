@@ -1,11 +1,11 @@
 import {Command} from 'commander';
 import {Atomicals} from '.';
-import * as dotenv from 'dotenv'
 import {ConfigurationInterface} from './interfaces/configuration.interface';
 import {ElectrumApi} from './api/electrum-api';
 import {validateCliInputs} from './utils/validate-cli-inputs';
 import {IValidatedWalletInfo, IWalletRecord, validateWalletStorage} from './utils/validate-wallet-storage';
 import * as qrcode from 'qrcode-terminal';
+import * as ecc from "tiny-secp256k1";
 import {
   detectAddressTypeToScripthash,
   detectScriptToAddressType,
@@ -16,8 +16,9 @@ import {fileReader} from './utils/file-utils';
 import {compactIdToOutpoint, outpointToCompactId} from './utils/atomical-format-helpers';
 import * as quotes from 'success-motivational-quotes';
 import * as chalk from 'chalk';
-
-dotenv.config();
+import {getKeypairInfo} from "./utils/address-keypair-path";
+import {initEccLib} from "bitcoinjs-lib";
+import ECPairFactory from "ecpair";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // General Helper Functions
@@ -1592,9 +1593,24 @@ program.command('mint-dft')
   .option('--disablechalk', 'Whether to disable the real-time chalked logging of each hash for Bitwork mining. Improvements mining performance to set this flag')
   .action(async (ticker, options) => {
     try {
+      initEccLib(ecc);
+      const ECPair = ECPairFactory(ecc)
+
       ticker = ticker.toLowerCase();
       const atomicals = new Atomicals(ElectrumApi.createClient(options.url));
-
+      const fundingKeypairRaw = ECPair.fromWIF(options.funding);
+      const fundingKeypair = getKeypairInfo(fundingKeypairRaw);
+      const history: any = await atomicals.getHistory(fundingKeypair.address);
+      let unconfirmed = 0
+      for (let {tx_hash, height} of history.data.history) {
+        if ((height as number) <= 0) {
+          unconfirmed++
+        }
+      }
+      if (unconfirmed >= 12) {
+        console.log(`${fundingKeypair.address} ${unconfirmed} unconfirmed utxos skip`)
+        return
+      }
       const result: any = await atomicals.mintDftInteractive({
         rbf: options.rbf,
         satsbyte: parseInt(options.satsbyte),
