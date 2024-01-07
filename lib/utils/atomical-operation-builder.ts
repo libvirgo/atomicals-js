@@ -717,6 +717,9 @@ export class AtomicalOperationBuilder {
     console.log("Workers have completed their tasks.");
     let endTime = new Date().getTime();
     console.log("Commit workers Total time taken: " + (endTime - startTime) / 1000 + " seconds");
+    if (messageFromWorker.sequence === 0 || messageFromWorker.nonce === 0 || messageFromWorker.time === 0) {
+      throw new Error("Error to get the correct sequence, nonce and time from workers.");
+    }
 
     console.log(`Success get result: ${JSON.stringify(messageFromWorker)}`);
 
