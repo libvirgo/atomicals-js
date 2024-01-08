@@ -17,8 +17,9 @@ import {compactIdToOutpoint, outpointToCompactId} from './utils/atomical-format-
 import * as quotes from 'success-motivational-quotes';
 import * as chalk from 'chalk';
 import {getKeypairInfo} from "./utils/address-keypair-path";
-import {initEccLib} from "bitcoinjs-lib";
+import {address, initEccLib} from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
+import {changeNetwork, NETWORK} from "./commands/command-helpers";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // General Helper Functions
@@ -1591,6 +1592,7 @@ program.command('mint-dft')
   .option('--funding <string>', 'private key')
   .option('--satsbyte <number>', 'Satoshis per byte in fees', '150')
   .option('--disablechalk', 'Whether to disable the real-time chalked logging of each hash for Bitwork mining. Improvements mining performance to set this flag')
+  .option('--network <string>', 'Network to use', 'testnet')
   .action(async (ticker, options) => {
     try {
       initEccLib(ecc);
@@ -1611,6 +1613,14 @@ program.command('mint-dft')
         console.log(`${fundingKeypair.address} ${unconfirmed} unconfirmed utxos skip`)
         return
       }
+      if (options.network !== 'testnet' && options.network !== 'bitcoin') {
+        console.log('network must be testnet or bitcoin')
+        return
+      }
+      changeNetwork(options.network);
+      console.log(`Running at network: ${JSON.stringify(options.network)}, address prefix:${NETWORK.bech32}`)
+      // if it is invalid address, it will throw error
+      address.toOutputScript(options.toaddr, NETWORK);
       const result: any = await atomicals.mintDftInteractive({
         rbf: options.rbf,
         satsbyte: parseInt(options.satsbyte),
