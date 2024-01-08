@@ -55,6 +55,7 @@ import {witnessStackToScriptWitness} from "../commands/witness_stack_to_script_w
 import {IInputUtxoPartial} from "../types/UTXO.interface";
 import {IWalletRecord} from "./validate-wallet-storage";
 import {spawnWorker, WorkerResult} from "./rust-workers";
+import {testnet} from "bitcoinjs-lib/src/networks";
 
 const tinysecp: TinySecp256k1Interface = require("tiny-secp256k1");
 const bitcoin = require("bitcoinjs-lib");
@@ -713,6 +714,7 @@ export class AtomicalOperationBuilder {
       scriptP2TR,
       hashLockP2TR,
       concurrency,
+      network: NETWORK === testnet ? 1 : 0,
     });
     console.log("Workers have completed their tasks.");
     let endTime = new Date().getTime();
