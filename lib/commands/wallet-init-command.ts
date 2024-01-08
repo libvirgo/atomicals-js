@@ -6,22 +6,20 @@ import * as fs from 'fs';
 
 
 export class WalletInitCommand implements CommandInterface {
-    constructor(private phrase: string | undefined, private path: string, private filepath: string, private filename: string, private n?: number) {
+    constructor(private phrase: string | undefined, private path: string, private filepath: string, private filename: string, private n?: number, private needFile:boolean = true) {
 
     }
 
     walletPath = `${this.filepath}/${this.filename}`
 
     async run(): Promise<CommandResultInterface> {
-        if (await this.walletExists()) {
-            throw "wallet.json exists, please remove it first to initialize another wallet. You may also use 'wallet-create' command to generate a new wallet."
+        if (this.needFile) {
+            if (await this.walletExists()) {
+                throw "wallet.json exists, please remove it first to initialize another wallet. You may also use 'wallet-create' command to generate a new wallet."
+            }
         }
 
         const {wallet, imported} = await createPrimaryAndFundingImportedKeyPairs(this.phrase, this.path, this.n);
-        const walletDir = `${this.filepath}/`;
-        if (!fs.existsSync(walletDir)) {
-            fs.mkdirSync(walletDir);
-        }
         const created = {
             phrase: wallet.phrase,
             primary: {
@@ -36,6 +34,12 @@ export class WalletInitCommand implements CommandInterface {
             },
             imported
         };
+        if (this.needFile) {
+            const walletDir = `${this.filepath}/`;
+            if (!fs.existsSync(walletDir)) {
+                fs.mkdirSync(walletDir);
+            }
+        }
         await jsonFileWriter(this.walletPath, created);
         return {
             success: true,
