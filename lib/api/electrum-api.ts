@@ -124,7 +124,7 @@ export class ElectrumApi implements ElectrumApiInterface {
     return new Promise((resolve, reject) => {
       let intervalId: any;
       const checkForUtxo = async () => {
-        console.log('...');
+        console.log(`WAITING UNTIL ${satoshis / 100000000} BTC RECEIVED AT ${address}`)
         try {
           const response: any = await this.getUnspentAddress(address).catch((e) => {
             // console.error(e);
