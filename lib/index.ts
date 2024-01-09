@@ -1375,17 +1375,3 @@ export class Atomicals implements APIInterface {
 export function instance(config: ConfigurationInterface, electrumUrl: string): APIInterface {
     return new Atomicals(ElectrumApi.createClient(electrumUrl));
 }
-
-try {
-    // Running under node, we are in command line mode
-    if (typeof window !== 'undefined') {
-        // otherwise we are being used as a kind of library
-        window['atomicals'] = {
-            instance: instance
-        };
-    }
-} catch (ex) {
-    // Window is not defined, must be running in windowless node env...
-    console.log("atomicals window object not found. Skipping initialization on window object")
-}
-

@@ -135,7 +135,7 @@ function logMiningProgressToConsole(
   // process.stdout.write(chalk.red(txid, " nonces: ", nonces));
 }
 
-function printBitworkLog(bitworkInfo: BitworkInfo, commit?: boolean) {
+export function printBitworkLog(bitworkInfo: BitworkInfo, commit?: boolean) {
   if (!bitworkInfo) {
     return;
   }
