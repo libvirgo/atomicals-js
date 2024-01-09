@@ -1,5 +1,5 @@
 dist/
-psbt
+../server/psbt
 .DS_Store
 node_modules/
 npm-debug.log*

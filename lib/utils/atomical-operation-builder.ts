@@ -40,7 +40,7 @@ import {
 } from "./atomical-format-helpers";
 import * as ecc from "tiny-secp256k1";
 import {ECPairAPI, ECPairFactory, TinySecp256k1Interface} from "ecpair";
-import {initEccLib, Psbt} from "bitcoinjs-lib";
+import { initEccLib, Payment, Psbt } from 'bitcoinjs-lib';
 import {
   AtomicalsPayload,
   getAndCheckAtomicalInfo,
@@ -665,7 +665,6 @@ export class AtomicalOperationBuilder {
         mockBaseCommitForFeeCalculation.hashLockP2TR.redeem.output
           .length
       );
-
     ////////////////////////////////////////////////////////////////////////
     // Begin Commit Transaction
     ////////////////////////////////////////////////////////////////////////
@@ -725,7 +724,7 @@ export class AtomicalOperationBuilder {
 
     console.log(`Success get result: ${JSON.stringify(messageFromWorker)}`);
 
-    let handleResult = (result: WorkerResult) => {
+    let handleResult = async (result: WorkerResult) => {
       copiedData["args"]["nonce"] = result.nonce;
       copiedData["args"]["time"] = result.time;
       const atomPayload = new AtomicalsPayload(
@@ -780,7 +779,7 @@ export class AtomicalOperationBuilder {
         psbtStart,
         interTx
       );
-      if (!this.broadcastWithRetries(interTx.getId(), rawtx, 'commit')) {
+      if (!await this.broadcastWithRetries(interTx.getId(), rawtx, 'commit')) {
         console.log("Error sending", interTx.getId(), rawtx);
         throw new Error(
           "Unable to broadcast commit transaction after attempts: " +
@@ -799,7 +798,7 @@ export class AtomicalOperationBuilder {
       }
     }
 
-    handleResult(messageFromWorker);
+    await handleResult(messageFromWorker);
     ////////////////////////////////////////////////////////////////////////
     // Begin Reveal Transaction
     ////////////////////////////////////////////////////////////////////////

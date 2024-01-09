@@ -13,6 +13,7 @@ export interface WorkerResult {
 // get stdout and stderr data and log it
 export async function spawnWorker(bin, data): Promise<WorkerResult> {
   return new Promise<WorkerResult>((resolve, reject) => {
+    console.log(`args:${JSON.stringify(data, null, 2)}`)
     const child = spawn(bin, [JSON.stringify(data)]);
     let stdout = '';
     let stderr = '';

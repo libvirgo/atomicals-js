@@ -4,10 +4,10 @@ import * as mime from 'mime-types';
 import { chunkBuffer, fileReader, jsonFileReader } from "../utils/file-utils";
 import * as cbor from 'borc';
 import {
-    networks,
-    script,
-    payments,
-} from "bitcoinjs-lib";
+  networks,
+  script,
+  payments, Network, Payment
+} from 'bitcoinjs-lib';
 import { KeyPairInfo } from "../utils/address-keypair-path";
 import { ATOMICALS_PROTOCOL_ENVELOPE_ID } from "../types/protocol-tags";
 import { ElectrumApiInterface } from "../api/electrum-api.interface";
@@ -147,7 +147,7 @@ export const prepareCommitRevealConfig2 = (opType: 'nft' | 'ft' | 'dft' | 'dmt' 
     }
 }
 
-export const prepareCommitRevealConfig = (opType: 'nft' | 'ft' | 'dft' | 'dmt' | 'sl' | 'x' | 'y' | 'mod' | 'evt' | 'dat', keypair: KeyPairInfo, atomicalsPayload: AtomicalsPayload, log = true) => {
+export const prepareCommitRevealConfig = (opType: 'nft' | 'ft' | 'dft' | 'dmt' | 'sl' | 'x' | 'y' | 'mod' | 'evt' | 'dat', keypair: KeyPairInfo, atomicalsPayload: AtomicalsPayload, log = true, network: Network = NETWORK) => {
     const revealScript = appendMintUpdateRevealScript(opType, keypair, atomicalsPayload, log);
     const hashscript = script.fromASM(revealScript);
     const scriptTree = {
@@ -158,20 +158,21 @@ export const prepareCommitRevealConfig = (opType: 'nft' | 'ft' | 'dft' | 'dmt' |
         output: hash_lock_script,
         redeemVersion: 192,
     };
-    const scriptP2TR = payments.p2tr({
+    console.log(`keypair: ${JSON.stringify(keypair.childNodeXOnlyPubkey)} revealScript: ${revealScript}`)
+    const scriptP2TR: Payment = payments.p2tr({
         internalPubkey: keypair.childNodeXOnlyPubkey,
         scriptTree,
-        network: NETWORK
+        network: network
     });
 
     const hashLockP2TR = payments.p2tr({
         internalPubkey: keypair.childNodeXOnlyPubkey,
         scriptTree,
         redeem: hashLockRedeem,
-        network: NETWORK
+        network: network
     });
     return {
-        scriptP2TR,
+        scriptP2TR: scriptP2TR,
         hashLockP2TR,
         hashscript
     }
@@ -188,23 +189,23 @@ export const readAsAtomicalFileData = async (file: string, alternateName?: strin
     return fileMintData;
 }
 /**
- * 
+ *
  * Prepare file data from a file on disk, with an optional renaming of the file
  * OR...
  * field data (ie: JSON value or object)
- * 
+ *
  * Syntax:
- * 
+ *
  * Case 1: Store raw file, using the filename on disk as the field name:  file.txt
  * Result: file.txt: { ... file data embedded }
- * 
+ *
  * Case 2: Store raw file, but use an alternate field name: filerenamed.to.anything:file.txt
  * Result: filerenamed.to.anything: { ... file data embedded }
- * 
+ *
  * Case 3: Store scalar value or object, using a specified field name: "meta={\"hello"\:\"world\"}" or meta=123 or "meta=this is a text string"
- * 
- * @param files Key value array of files and names OR the field name and field data 
- * @returns 
+ *
+ * @param files Key value array of files and names OR the field name and field data
+ * @returns
  */
 export const prepareFilesData = async (fields: string[]) => {
     const filesData: AtomicalFileData[] = [];
@@ -442,7 +443,7 @@ export const encodeFiles = (files: AtomicalFileData[]): any => {
 
 /**
  * Ensure provided object is restricted to the set of allowable datatypes to be CBOR atomicals friendly.
- * 
+ *
  */
 export class AtomicalsPayload {
     private cborEncoded;
@@ -614,4 +615,4 @@ export const getAndCheckAtomicalInfo = async (electrumApi: ElectrumApiInterface,
         locationInfo,
         inputUtxoPartial
     }
-}   
+}
