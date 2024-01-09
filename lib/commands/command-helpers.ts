@@ -158,7 +158,6 @@ export const prepareCommitRevealConfig = (opType: 'nft' | 'ft' | 'dft' | 'dmt' |
         output: hash_lock_script,
         redeemVersion: 192,
     };
-    console.log(`keypair: ${JSON.stringify(keypair.childNodeXOnlyPubkey)} revealScript: ${revealScript}`)
     const scriptP2TR: Payment = payments.p2tr({
         internalPubkey: keypair.childNodeXOnlyPubkey,
         scriptTree,
