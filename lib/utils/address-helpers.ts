@@ -21,10 +21,10 @@ function convertAddressToScripthash(address, network) {
   };
 }
 
-export function detectAddressTypeToScripthash(address: string): { output: string, scripthash: string, address: string } {
+export function detectAddressTypeToScripthash(address: string, network = NETWORK): { output: string, scripthash: string, address: string } {
   // Detect legacy address
   try {
-    bitcoin.address.fromBase58Check(address, NETWORK);
+    bitcoin.address.fromBase58Check(address, network);
     const p2pkh = addressToP2PKH(address);
     const p2pkhBuf = Buffer.from(p2pkh, "hex");
     return {
@@ -42,7 +42,7 @@ export function detectAddressTypeToScripthash(address: string): { output: string
   const REGTEST_TAPROOT_PREFIX = 'bcrt1p';
   if (address.startsWith(BECH32_SEGWIT_PREFIX) || address.startsWith(BECH32_TAPROOT_PREFIX) ||
       address.startsWith(TESTNET_SEGWIT_PREFIX) || address.startsWith(REGTEST_TAPROOT_PREFIX)) {
-    return convertAddressToScripthash(address, NETWORK);
+    return convertAddressToScripthash(address, network);
   } else {
     throw new Error(`Unrecognized address format for address: ${address}`);
   }

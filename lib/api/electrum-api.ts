@@ -4,6 +4,7 @@ import axios from 'axios';
 import {ElectrumApiInterface, IUnspentResponse} from "./electrum-api.interface";
 import {UTXO} from "../types/UTXO.interface"
 import {detectAddressTypeToScripthash} from "../utils/address-helpers"
+import { NETWORK } from '../commands/command-helpers';
 
 export class ElectrumApi implements ElectrumApiInterface {
   private isOpenFlag = false;
@@ -80,8 +81,8 @@ export class ElectrumApi implements ElectrumApiInterface {
     });
   }
 
-  public getUnspentAddress(address: string): Promise<IUnspentResponse | any> {
-    const {scripthash} = detectAddressTypeToScripthash(address)
+  public getUnspentAddress(address: string, network = NETWORK): Promise<IUnspentResponse | any> {
+    const {scripthash} = detectAddressTypeToScripthash(address, network)
     return this.getUnspentScripthash(scripthash)
   }
 
@@ -113,7 +114,7 @@ export class ElectrumApi implements ElectrumApiInterface {
     });
   }
 
-  async waitUntilUTXO(address: string, satoshis: number, intervalSeconds = 10, exactSatoshiAmount = false): Promise<UTXO> {
+  async waitUntilUTXO(address: string, satoshis: number, intervalSeconds = 10, exactSatoshiAmount = false, network = NETWORK): Promise<UTXO> {
     function hasAttachedAtomicals(utxo): any | null {
       if (utxo && utxo.atomicals && utxo.atomicals.length) {
         return true;
@@ -126,7 +127,7 @@ export class ElectrumApi implements ElectrumApiInterface {
       const checkForUtxo = async () => {
         console.log(`WAITING UNTIL ${satoshis / 100000000} BTC RECEIVED AT ${address}`)
         try {
-          const response: any = await this.getUnspentAddress(address).catch((e) => {
+          const response: any = await this.getUnspentAddress(address, network).catch((e) => {
             // console.error(e);
             return {unconfirmed: 0, confirmed: 0, utxos: []};
           });
@@ -212,7 +213,7 @@ export class ElectrumApi implements ElectrumApiInterface {
   }
 
   public history(scripthash: string): Promise<any> {
-    return this.call('blockchain.scripthash.get_history', [scripthash]);
+    let his = this.call('blockchain.scripthash.get_history', [scripthash]);
   }
 
   public atomicalsList(limit: number, offset: number, asc = false): Promise<any> {
