@@ -1010,7 +1010,6 @@ export class AtomicalOperationBuilder {
       data: {
         commitTxid,
         revealTxid,
-        magic: 'a0f26bfc-1d4c-4e17-9ba2-3a7264baee21'
       },
     };
     if (
@@ -1038,14 +1037,6 @@ export class AtomicalOperationBuilder {
           break;
         }
       } catch (err) {
-        let broadcastError: BroadcastResult = {
-          success: false,
-          txId: txId,
-          rawTx: rawtx,
-          step: step == 'commit' ? 0 : 1,
-          magic: step == 'commit' ? '578dbabe-0702-48d8-ab4d-d851a7689bd1' : '882839e3-4aca-4c6b-93ec-801a3855929e',
-        }
-        console.log(JSON.stringify(broadcastError))
         console.log(`Broadcasting ${step} Network error broadcasting (Trying again soon...), tx: ${rawtx}`);
         await this.options.electrumApi.resetConnection();
         // Put in a sleep to help the connection reset more gracefully in case there is some delay
