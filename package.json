@@ -7,8 +7,6 @@
   "typings": "dist/index.d.ts",
   "type": "commonjs",
   "scripts": {
-    "clean": "rm -rf ./dist && cargo clean --manifest-path ./psbt_rs/Cargo.toml && rm ../../psbt",
-    "build": "tsc && gulp build && cargo build --manifest-path ./psbt_rs/Cargo.toml --release && mv ./psbt_rs/target/release/psbt ../../psbt",
     "cli": "bun lib/cli.ts",
     "test": "mocha --timeout=30000 --reporter spec \"test/**/*.test.js\"",
     "e2e": "mocha --grep e2e  --timeout=300000 --reporter spec",
