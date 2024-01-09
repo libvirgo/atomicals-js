@@ -39,8 +39,8 @@ export class WalletInitCommand implements CommandInterface {
             if (!fs.existsSync(walletDir)) {
                 fs.mkdirSync(walletDir);
             }
+            await jsonFileWriter(this.walletPath, created);
         }
-        await jsonFileWriter(this.walletPath, created);
         return {
             success: true,
             data: created
