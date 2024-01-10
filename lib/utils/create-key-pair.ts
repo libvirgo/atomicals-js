@@ -1,18 +1,21 @@
-
-const bitcoin = require('bitcoinjs-lib');
+import { Network } from 'bitcoinjs-lib';
 import ECPairFactory from 'ecpair';
 import * as ecc from 'tiny-secp256k1';
 import { createMnemonicPhrase } from './create-mnemonic-phrase';
+import BIP32Factory from 'bip32';
+import { NETWORK } from '../commands/command-helpers';
+
+const bitcoin = require('bitcoinjs-lib');
+
 bitcoin.initEccLib(ecc);
 
 const ECPair = ECPairFactory(ecc);
-import BIP32Factory from 'bip32';
-import { NETWORK } from '../commands/command-helpers';
+
 const bip32 = BIP32Factory(ecc);
 
 export const toXOnly = (publicKey) => {
     return publicKey.slice(1, 33);
-}
+};
 const bip39 = require('bip39');
 
 export interface KeyPair {
@@ -24,7 +27,7 @@ export interface KeyPair {
     privateKey?: string
 }
 
-export const createKeyPair = async (phrase: string = '', path = `m/44'/0'/0'/0/0`) : Promise<KeyPair> => {
+export const createKeyPair = async (phrase: string = '', path = `m/44'/0'/0'/0/0`, network: Network = NETWORK): Promise<KeyPair> => {
     if (!phrase || phrase === '') {
         const phraseResult = await createMnemonicPhrase();
         phrase = phraseResult.phrase;
@@ -36,15 +39,15 @@ export const createKeyPair = async (phrase: string = '', path = `m/44'/0'/0'/0/0
     const childNodeXOnlyPubkeyPrimary = toXOnly(childNodePrimary.publicKey);
     const p2trPrimary = bitcoin.payments.p2tr({
         internalPubkey: childNodeXOnlyPubkeyPrimary,
-        network: NETWORK
+        network: network
     });
     if (!p2trPrimary.address || !p2trPrimary.output) {
-        throw "error creating p2tr"
+        throw 'error creating p2tr';
     }
     // Used for signing, since the output and address are using a tweaked key
     // We must tweak the signer in the same way.
     const tweakedChildNodePrimary = childNodePrimary.tweak(
-        bitcoin.crypto.taggedHash('TapTweak', childNodeXOnlyPubkeyPrimary),
+        bitcoin.crypto.taggedHash('TapTweak', childNodeXOnlyPubkeyPrimary)
     );
 
     // Do a sanity check with the WIF serialized and then verify childNodePrimary is the same
@@ -52,7 +55,7 @@ export const createKeyPair = async (phrase: string = '', path = `m/44'/0'/0'/0/0
     const keypair = ECPair.fromWIF(wif);
 
     if (childNodePrimary.publicKey.toString('hex') !== keypair.publicKey.toString('hex')) {
-        throw 'createKeyPair error child node not match sanity check'
+        throw 'createKeyPair error child node not match sanity check';
     }
     return {
         address: p2trPrimary.address,
@@ -60,15 +63,16 @@ export const createKeyPair = async (phrase: string = '', path = `m/44'/0'/0'/0/0
         publicKeyXOnly: childNodeXOnlyPubkeyPrimary.toString('hex'),
         path,
         WIF: childNodePrimary.toWIF(),
-        privateKey: childNodePrimary.privateKey?.toString('hex'),
-    }
-}
+        privateKey: childNodePrimary.privateKey?.toString('hex')
+    };
+};
+
 export interface WalletRequestDefinition {
-    phrase?: string | undefined
-    path?: string | undefined
+    phrase?: string | undefined;
+    path?: string | undefined;
 }
 
-export const createPrimaryAndFundingImportedKeyPairs = async (phrase?: string | undefined, path?: string | undefined, n?: number) => {
+export const createPrimaryAndFundingImportedKeyPairs = async (phrase?: string | undefined, path?: string | undefined, n?: number, network: Network = NETWORK) => {
     let phraseResult: any = phrase;
     if (!phraseResult) {
         phraseResult = await createMnemonicPhrase();
@@ -78,22 +82,22 @@ export const createPrimaryAndFundingImportedKeyPairs = async (phrase?: string | 
     if (path) {
         pathUsed = path;
     }
-    const imported = {}
+    const imported = {};
 
     if (n) {
         for (let i = 2; i < n + 2; i++) {
-            imported[i+''] = await createKeyPair(phraseResult, `${pathUsed}/0/` + i)
+            imported[i + ''] = await createKeyPair(phraseResult, `${pathUsed}/0/` + i, network);
         }
     }
     return {
         wallet: {
             phrase: phraseResult,
-            primary: await createKeyPair(phraseResult, `${pathUsed}/0/0`),
-            funding: await createKeyPair(phraseResult, `${pathUsed}/1/0`)
+            primary: await createKeyPair(phraseResult, `${pathUsed}/0/0`, network),
+            funding: await createKeyPair(phraseResult, `${pathUsed}/1/0`, network)
         },
         imported
-    }
-}
+    };
+};
 
 export const createNKeyPairs = async (phrase, n = 1) => {
     const keypairs: any = [];
@@ -102,6 +106,6 @@ export const createNKeyPairs = async (phrase, n = 1) => {
     }
     return {
         phrase,
-        keypairs,
-    }
-}
+        keypairs
+    };
+};

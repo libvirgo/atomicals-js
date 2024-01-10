@@ -5,7 +5,6 @@ import { ElectrumApiInterface, IUnspentResponse } from './electrum-api.interface
 import { UTXO } from '../types/UTXO.interface';
 import { detectAddressTypeToScripthash } from '../utils/address-helpers';
 import { NETWORK } from '../commands/command-helpers';
-import { Errors } from 'utils/atom/errors';
 
 export class ElectrumApi implements ElectrumApiInterface {
     private isOpenFlag = false;
@@ -60,7 +59,7 @@ export class ElectrumApi implements ElectrumApiInterface {
 
                 const response = await axios(options);
                 return response.data.response;
-            } catch (error) {
+            } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
                     console.log(`Error calling ${method} with params ${params} error: ${error.response.data.message} at endpoint: ${baseUrl}`);
                     throw Error(error.response.data.message);
