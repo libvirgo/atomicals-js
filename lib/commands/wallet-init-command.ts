@@ -20,8 +20,10 @@ export class WalletInitCommand implements CommandInterface {
                 throw 'wallet.json exists, please remove it first to initialize another wallet. You may also use \'wallet-create\' command to generate a new wallet.';
             }
         }
-
-        const { wallet, imported } = await createPrimaryAndFundingImportedKeyPairs(this.phrase, this.path, this.n, network);
+        const {
+            wallet,
+            imported
+        } = await createPrimaryAndFundingImportedKeyPairs(this.phrase, this.path, this.n, network);
         const created = {
             phrase: wallet.phrase,
             primary: {
