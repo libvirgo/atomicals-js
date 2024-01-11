@@ -62,8 +62,7 @@ export class ElectrumApi implements ElectrumApiInterface {
                 return response.data.response;
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
-                    console.log(`Error calling ${method} with params ${params} error: ${error.response.data.message} at endpoint: ${baseUrl}`);
-                    err = error;
+                    err = new Error(error.response.data.message + ` at endpoint: ${baseUrl}`);
                 } else {
                     console.log(`Error calling ${method} with params ${params} error: ${error} at endpoint: ${baseUrl}`);
                     err = error;
