@@ -48,6 +48,7 @@ export class ElectrumApi implements ElectrumApiInterface {
     }
 
     public async call(method, params) {
+        let err: any | Error = null;
         for (const baseUrl of this.endpoints) {
             try {
                 const url = `${baseUrl}/${method}`;
@@ -62,14 +63,19 @@ export class ElectrumApi implements ElectrumApiInterface {
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
                     console.log(`Error calling ${method} with params ${params} error: ${error.response.data.message} at endpoint: ${baseUrl}`);
-                    throw Error(error.response.data.message);
+                    err = error;
+                } else {
+                    console.log(`Error calling ${method} with params ${params} error: ${error} at endpoint: ${baseUrl}`);
+                    err = error;
                 }
-                console.log(`Error calling ${method} with params ${params} error: ${error} at endpoint: ${baseUrl}`);
-                throw Error(`Error calling ${method} with params ${params} error: ${error}`);
             }
         }
 
-        throw new Error('All endpoints failed');
+        if (err != null) {
+            throw err;
+        } else {
+            throw new Error('No endpoints available');
+        }
     }
 
     public sendTransaction(signedRawTx: string): Promise<any> {
