@@ -74,6 +74,7 @@ export class ElectrumApi implements ElectrumApiInterface {
                         } else {
                             buf = Buffer.concat([buf, data]);
                             resolve(buf.toString());
+                            socket.shutdown();
                         }
                         // resolve(data.toString());
                     },
