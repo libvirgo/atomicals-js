@@ -78,7 +78,6 @@ export class ElectrumApi implements ElectrumApiInterface {
                         // resolve(data.toString());
                     },
                     open(socket: Socket): void | Promise<void> {
-                        console.log('open');
                         socket.write(makeRequest(method, params, '1') + '\n');
                     },
                     error(socket: Socket, error: Error): void | Promise<void> {
