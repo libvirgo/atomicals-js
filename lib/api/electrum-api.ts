@@ -100,7 +100,6 @@ export class ElectrumApi implements ElectrumApiInterface {
                 const url = new URL(baseUrl);
                 const host = url.hostname;
                 const port = parseInt(url.port);
-                console.log(host, port)
                 const response = await this.getSocketPromise(host, port, method, params);
                 let res: any = JSON.parse(response);
                 if (res.result) {
