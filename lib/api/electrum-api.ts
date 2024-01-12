@@ -5,6 +5,7 @@ import { UTXO } from '../types/UTXO.interface';
 import { detectAddressTypeToScripthash } from '../utils/address-helpers';
 import { NETWORK } from '../commands/command-helpers';
 import { Socket } from 'bun';
+import axios from 'axios';
 
 export class ElectrumApi implements ElectrumApiInterface {
     private isOpenFlag = false;
@@ -73,8 +74,8 @@ export class ElectrumApi implements ElectrumApiInterface {
                             return;
                         } else {
                             buf = Buffer.concat([buf, data]);
-                            resolve(buf.toString());
                             socket.shutdown();
+                            resolve(buf.toString());
                         }
                         // resolve(data.toString());
                     },
@@ -98,16 +99,29 @@ export class ElectrumApi implements ElectrumApiInterface {
             try {
                 // get host and port from baseUrl
                 const url = new URL(baseUrl);
-                const host = url.hostname;
-                const port = parseInt(url.port);
-                const response = await this.getSocketPromise(host, port, method, params);
-                let res: any = JSON.parse(response);
-                if (res.result) {
-                    return res.result;
-                } else if (res.error) {
-                    err = Error(res.error.message);
+                // if protocol is http or https, use axios
+                if (url.protocol === 'http:' || url.protocol === 'https:') {
+                    const url = `${baseUrl}/${method}`;
+                    const options = {
+                        method: this.usePost ? 'post' : 'get',
+                        url: url,
+                        ...(this.usePost ? { data: { params } } : { params: params })
+                    };
+
+                    const response = await axios(options);
+                    return response.data.response;
                 } else {
-                    err = Error(response);
+                    const host = url.hostname;
+                    const port = parseInt(url.port);
+                    const response = await this.getSocketPromise(host, port, method, params);
+                    let res: any = JSON.parse(response);
+                    if (res.result) {
+                        return res.result;
+                    } else if (res.error) {
+                        err = Error(res.error.message);
+                    } else {
+                        err = Error(response);
+                    }
                 }
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
