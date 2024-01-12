@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable prettier/prettier */
-import axios from 'axios';
 import { ElectrumApiInterface, IUnspentResponse } from './electrum-api.interface';
 import { UTXO } from '../types/UTXO.interface';
 import { detectAddressTypeToScripthash } from '../utils/address-helpers';
 import { NETWORK } from '../commands/command-helpers';
+import { Socket } from 'bun';
 
 export class ElectrumApi implements ElectrumApiInterface {
     private isOpenFlag = false;
     private endpoints: string[] = [];
+    private socket: Socket | null = null;
 
     private constructor(private baseUrl: string, private usePost = true) {
         this.initEndpoints(baseUrl);
@@ -47,19 +48,68 @@ export class ElectrumApi implements ElectrumApiInterface {
         return Promise.resolve(true);
     }
 
+    private makeRequest(method: string, params: any, id: string): string {
+        return JSON.stringify({
+            jsonrpc: '2.0',
+            method: method,
+            params: params,
+            id: id
+        });
+    }
+
+    private getSocketPromise(host: string, port: number, method: string, params: string): Promise<string> {
+        const makeRequest = this.makeRequest;
+        return new Promise((resolve, reject) => {
+            let buf = new Buffer('', 'utf8');
+            let s = Bun.connect({
+                hostname: host,
+                port: port,
+                tls: false,
+                socket: {
+                    data(socket: Socket, data: Buffer): void | Promise<void> {
+                        // whether data is end
+                        if (data.toString().indexOf('\n') === -1) {
+                            buf = Buffer.concat([buf, data]);
+                            return;
+                        } else {
+                            buf = Buffer.concat([buf, data]);
+                            resolve(buf.toString());
+                        }
+                        // resolve(data.toString());
+                    },
+                    open(socket: Socket): void | Promise<void> {
+                        console.log('open');
+                        socket.write(makeRequest(method, params, '1') + '\n');
+                    },
+                    error(socket: Socket, error: Error): void | Promise<void> {
+                        reject(error);
+                    },
+                    drain(socket: Socket): void | Promise<void> {
+                        console.log('drain');
+                    }
+                }
+            });
+        });
+    }
+
     public async call(method, params) {
         let err: any | Error = null;
         for (const baseUrl of this.endpoints) {
             try {
-                const url = `${baseUrl}/${method}`;
-                const options = {
-                    method: this.usePost ? 'post' : 'get',
-                    url: url,
-                    ...(this.usePost ? { data: { params } } : { params: params })
-                };
-
-                const response = await axios(options);
-                return response.data.response;
+                // get host and port from baseUrl
+                const url = new URL(baseUrl);
+                const host = url.hostname;
+                const port = parseInt(url.port);
+                console.log(host, port)
+                const response = await this.getSocketPromise(host, port, method, params);
+                let res: any = JSON.parse(response);
+                if (res.result) {
+                    return res.result;
+                } else if (res.error) {
+                    err = Error(res.error.message);
+                } else {
+                    err = Error(response);
+                }
             } catch (error: any) {
                 if (error.response && error.response.data && error.response.data.message) {
                     err = new Error(error.response.data.message + ` at endpoint: ${baseUrl}`);
