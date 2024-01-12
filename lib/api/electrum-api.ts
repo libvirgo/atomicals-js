@@ -60,7 +60,7 @@ export class ElectrumApi implements ElectrumApiInterface {
     private getSocketPromise(host: string, port: number, method: string, params: string): Promise<string> {
         const makeRequest = this.makeRequest;
         return new Promise((resolve, reject) => {
-            let buf = new Buffer('', 'utf8');
+            let buf = Buffer.from([]);
             let s = Bun.connect({
                 hostname: host,
                 port: port,
