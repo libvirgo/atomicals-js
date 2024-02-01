@@ -60,13 +60,17 @@ export class ElectrumApi implements ElectrumApiInterface {
 
     private getSocketPromise(host: string, port: number, method: string, params: string): Promise<string> {
         const makeRequest = this.makeRequest;
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             let buf = Buffer.from([]);
-            let s = Bun.connect({
+            let s = await Bun.connect({
                 hostname: host,
                 port: port,
                 tls: false,
                 socket: {
+                    timeout(socket: Socket): void | Promise<void> {
+                        console.log('timeout');
+                        reject(new Error(`connect to ${host}:${port} timeout`));
+                    },
                     data(socket: Socket, data: Buffer): void | Promise<void> {
                         // whether data is end
                         if (data.toString().indexOf('\n') === -1) {
@@ -90,6 +94,7 @@ export class ElectrumApi implements ElectrumApiInterface {
                     }
                 }
             });
+            s.timeout(5);
         });
     }
 
