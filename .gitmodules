@@ -1,3 +1,0 @@
-[submodule "psbt_rs"]
-	path = psbt_rs
-	url = https://github.com/libvirgo/atomicals-psbt-rs.git
